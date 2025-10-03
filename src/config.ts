@@ -10,7 +10,7 @@ export default {
   // 网站作者
   Author: 'wei',
   // 作者头像
-  Avatar: 'https://raw.githubusercontent.com/FuminoriMatsumoto/Pictures/refs/heads/main/ResizedImage_2025-09-14_10-03-27_1.jpg',
+  Avatar: 'https://szakblog.netlify.app/ResizedImage_2025-09-14_10-03-27_1.jpg',
   // 网站座右铭
   Motto: 'hello',
   // Cover 网站缩略图
@@ -99,7 +99,7 @@ export default {
     }
   },
   // Han Analytics 统计（）
-  HanAnalytics: { enable: true, server: 'https://analytics.vvhan.com', siteId: '' },
+  HanAnalytics: { enable: true, server: '', siteId: '' },
   // Google 广告
   GoogleAds: {
     ad_Client: '', //ca-pub-xxxxxx
