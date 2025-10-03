@@ -22,7 +22,7 @@ type: "about"
 
 QQ:**3466014364**
 
-邮件:**TownsTimePeopleoutkook.com**
+邮件:**TownsTimePeople@outkook.com**
 
 微信号/微信 ID:**Seayoustar**
 
