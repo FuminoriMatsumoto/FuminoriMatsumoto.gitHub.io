@@ -24,6 +24,9 @@ import "@/styles/Reset.less";
 import "@/styles/Base.less";
 // Layout 样式
 import "./Layout.less";
+
+//动态背景图 URL，带时间戳避免缓存
+const bgUrl = `https://random.api.mikus.ink/mobile?ts=${Date.now()}`;
 ---
 
 <html lang="zh-CN">
@@ -39,24 +42,27 @@ import "./Layout.less";
 				.join("")}--vh-main-header-height:${Home ? HomeBanner.HomeHeight : HomeBanner.PageHeight};--vh-home-banner:${HomeBanner.background}}</style>`}
 		/>
 	</Head>
-	<body>
-		<MobileSidebar />
-		<Header activeNav={activeNav} />
-		<main class="main">
-			{HomeBanner.enable && <MainHeader />}
-			<section class="main-inner" style={`padding-top:${HomeBanner.enable ? "0.88rem" : "calc(66px + 0.68rem)"}`}>
-				<section class="main-inner-content">
-					<slot />
-				</section>
-				<Aside />
-			</section>
-			<BackTop />
-		</main>
-		<Footer />
-		<script>
-			import InitFn from "@/scripts/Init";
-			// 全局初始化
-			InitFn();
-		</script>
-	</body>
+<body style={`background: url(${bgUrl}) no-repeat center 60% / cover;`}>
+    <MobileSidebar />
+    <Header activeNav={activeNav} />
+    <main class="main">
+      {HomeBanner.enable && <MainHeader />}
+      <section
+        class="main-inner"
+        style={`padding-top:${HomeBanner.enable ? HomeBanner.Height : "0px"}`}
+      >
+        <section class="main-inner-content">
+          <slot />
+        </section>
+        <Aside />
+      </section>
+      <BackTop />
+    </main>
+    <Footer />
+    <script>
+      import InitFn from "@/scripts/Init";
+      // 全局初始化
+      InitFn();
+    </script>
+  </body>
 </html>
