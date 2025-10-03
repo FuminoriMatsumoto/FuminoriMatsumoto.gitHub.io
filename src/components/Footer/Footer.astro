@@ -1,0 +1,24 @@
+---
+// 基础 样式
+import "./Footer.less";
+---
+
+<footer class="vh-footer">
+  <span id="runtime"></span>
+  <a href="/rss.xml" target="_blank" rel="noopener noreferrer">📡 RSS订阅</a>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const start = new Date("2025-10-03T00:00:00"); // 你的网站创建日期
+      function updateRuntime() {
+        const now = new Date();
+        const diff = now - start;
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        // 如果小于1天，显示0天
+        const displayDays = days < 1 ? 0 : days;
+        document.getElementById("runtime").innerText = `本站已运行 ${displayDays} 天`;
+      }
+      updateRuntime();
+    });
+  </script>
+</footer>
