@@ -2,7 +2,7 @@ export default {
   // 网站标题
   Title: 'szakblog',
   // 网站地址
-  Site: 'https://fuminorimatsumoto.github.io/',
+  Site: 'https://fuminorimatsumoto.github.io',
   // 网站副标题
   Subtitle: '美丽的语言勾勒出美丽的世界',
   // 网站描述
