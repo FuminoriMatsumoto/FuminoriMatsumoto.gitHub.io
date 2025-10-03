@@ -13,8 +13,8 @@ type: "links"
 :::
 
 ```yaml
-name: 韩小韩博客
-link: https://www.vvhan.com/
-avatar: https://q1.qlogo.cn/g?b=qq&nk=1655466387&s=640
-desc: 运气是计划之外的东西.
+name: szak
+link: https://fuminorimatsumoto.github.io/links/
+avatar: https://szakblog.netlify.app/ResizedImage_2025-09-14_10-03-27_1.jpg
+desc: 海内存知己天涯若比邻.
 ```
