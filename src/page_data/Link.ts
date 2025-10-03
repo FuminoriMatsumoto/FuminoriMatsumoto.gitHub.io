@@ -1,19 +1,23 @@
 export default {
-  // API 接口请求优先，数据格式保持和 data 一致
   api: '',
-  // api 为空则使用 data 静态数据
   data: [
     {
-      "name": "韩小韩博客",
-      "link": "https://www.vvhan.com",
-      "avatar": "https://q1.qlogo.cn/g?b=qq&nk=1655466387&s=640",
-      "descr": "运气是计划之外的东西."
+      "name": "茶の小屋",
+      "link": "https://blog.cha.moe/",
+      "avatar": "https://blog.cha.moe/favicon.ico",
+      "descr": "记录生活，分享点滴"
     },
     {
-      "name": "韩小韩API",
-      "link": "https://api.vvhan.com",
-      "avatar": "https://api.vvhan.com/static/images/logo.webp",
-      "descr": "免费Web API数据接口调用服务平台."
+      "name": "木兰小站",
+      "link": "https://www.mlvlog.com/",
+      "avatar": "https://www.mlvlog.com/favicon.ico",
+      "descr": "给时光以生命，给岁月以文明"
+    },
+    {
+      "name": "Lparksi Blog",
+      "link": "https://blog.lparksi.com/",
+      "avatar": "https://blog.lparksi.com/favicon.ico",
+      "descr": "Redefine Yourself"
     }
   ]
 }
