@@ -1,9 +1,24 @@
 ---
-const { prev, next } = Astro.props;
 import "./PrevNextArticle.less";
+import { fmtTime } from "@/utils/index";
+
+const { prev, next } = Astro.props;
 ---
 
-<section class="vh-otarticle">
-	<a class="art-item" style={`background-image: url('${prev.cover}')`} href={prev.id}><span class="vh-ellipsis line-2">{prev.title}</span></a>
-	<a class="art-item" style={`background-image: url('${next.cover}')`} href={next.id}><span class="vh-ellipsis line-2">{next.title}</span></a>
-</section>
+<nav class="vh-prev-next">
+  {prev && (
+    <a class="vh-prev vh-prev-next-item" href={`/article/${prev.id}`}>
+      <div class="vh-prev-next-label">上一篇</div>
+      <div class="vh-prev-next-title vh-ellipsis">{prev.title}</div>
+      <time>{fmtTime(prev.date, "YYYY-MM-DD")}</time>
+    </a>
+  )}
+
+  {next && (
+    <a class="vh-next vh-prev-next-item" href={`/article/${next.id}`}>
+      <div class="vh-prev-next-label">下一篇</div>
+      <div class="vh-prev-next-title vh-ellipsis">{next.title}</div>
+      <time>{fmtTime(next.date, "YYYY-MM-DD")}</time>
+    </a>
+  )}
+</nav>

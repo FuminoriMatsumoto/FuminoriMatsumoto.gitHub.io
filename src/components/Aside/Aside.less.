@@ -1,0 +1,102 @@
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.15);
+  --glass-hover-bg: rgba(255, 255, 255, 0.25);
+  --glass-blur: 12px;
+  --glass-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.12);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --glass-bg: rgba(0, 0, 0, 0.35);
+    --glass-hover-bg: rgba(0, 0, 0, 0.45);
+    --glass-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.5);
+  }
+}
+
+.vh-aside {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  height: max-content;
+
+  .sticky-aside {
+    position: sticky;
+    top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  /* 默认卡片：无毛玻璃 */
+  .vh-aside-item {
+    border-radius: 1rem;
+    padding: 1rem;
+    background: none;
+    box-shadow: none;
+    transition: background 0.3s ease;
+  }
+
+  /* 下方模块：开启毛玻璃 */
+  .vh-aside-item.tips,
+  .vh-aside-item.cat,
+  .vh-aside-item.tags,
+  .vh-aside-item.articles,
+  .vh-aside-item.websites,
+  .vh-aside-item.ads {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    box-shadow: var(--glass-shadow);
+  }
+
+  /* 用户信息模块（保持干净背景） */
+  .vh-aside-item.user {
+    text-align: center;
+
+    .vh-aside-avatar {
+      width: 5rem;
+      height: 5rem;
+      margin: 0 auto 0.5rem;
+      border-radius: 50%;
+      overflow: hidden;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    .vh-aside-auther {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .vh-aside-motto {
+      font-size: 0.9rem;
+      color: var(--vh-font-66);
+    }
+
+    .vh-aside-github {
+      display: inline-block;
+      margin: 0.5rem 0;
+      padding: 0.3rem 0.8rem;
+      border-radius: 0.5rem;
+      background: var(--vh-main-color);
+      color: #fff;
+      font-size: 0.85rem;
+      text-decoration: none;
+      transition: opacity 0.2s;
+      &:hover { opacity: 0.85; }
+    }
+
+    .vh-aside-stats {
+      margin-top: 0.5rem;
+      display: flex;
+      justify-content: space-around;
+      font-size: 0.8rem;
+      color: var(--vh-font-66);
+    }
+  }
+}

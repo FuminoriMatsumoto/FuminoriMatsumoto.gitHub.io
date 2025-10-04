@@ -9,10 +9,10 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --glass-bg: rgba(0, 0, 0, 0.35);
-    --glass-hover-bg: rgba(0, 0, 0, 0.45);
-    --glass-shadow: 0 0.5rem 1.2rem rgba(0,0,0,0.5);
-    --glass-shadow-hover: 0 1rem 2rem rgba(0,0,0,0.65);
+    --glass-bg: rgba(255, 255, 255, 0.08);
+    --glass-hover-bg: rgba(255, 255, 255, 0.16);
+    --glass-shadow: 0 0.5rem 1.2rem rgba(0,0,0,0.35);
+    --glass-shadow-hover: 0 1rem 2rem rgba(0,0,0,0.5);
   }
 }
 
