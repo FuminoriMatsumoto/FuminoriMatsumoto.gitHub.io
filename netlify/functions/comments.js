@@ -3,57 +3,73 @@ const { Client } = pkg;
 
 export async function handler(event) {
   const client = new Client({
-    connectionString: process.env.NETLIFY_DATABASE_URL, // 在 Netlify 环境变量里配置
+    connectionString: process.env.NETLIFY_DATABASE_URL,
     ssl: { rejectUnauthorized: false }
   });
 
-  // 通用响应头
   const headers = {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type'
+    'Access-Control-Allow-Headers': 'Content-Type',
   };
-
-  // 处理 CORS 预检请求
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers, body: '' };
-  }
 
   try {
     await client.connect();
 
+    // 处理预检请求 (CORS)
+    if (event.httpMethod === 'OPTIONS') {
+      return { statusCode: 200, headers, body: '' };
+    }
+
+    // 获取评论
     if (event.httpMethod === 'GET') {
-      const postId = event.queryStringParameters.post_id;
-      if (!postId) {
+      const { post_id } = event.queryStringParameters;
+      if (!post_id) {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing post_id' }) };
       }
 
       const result = await client.query(
         'SELECT * FROM public.comments WHERE post_id = $1 ORDER BY created_at DESC',
-        [postId]
+        [post_id]
       );
 
-      return { statusCode: 200, headers, body: JSON.stringify(result.rows) };
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify(result.rows),
+      };
     }
 
+    // 提交评论
     if (event.httpMethod === 'POST') {
-      const { author, content, post_id } = JSON.parse(event.body);
+      const body = JSON.parse(event.body);
+
+      // 兼容 post_id 和 postId 两种写法
+      const author = body.author;
+      const content = body.content;
+      const post_id = body.post_id || body.postId;
+
       if (!author || !content || !post_id) {
         return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing fields' }) };
       }
 
-      const result = await client.query(
-        'INSERT INTO public.comments (author, content, post_id, created_at) VALUES ($1, $2, $3, NOW()) RETURNING *',
+      await client.query(
+        'INSERT INTO public.comments (author, content, post_id) VALUES ($1, $2, $3)',
         [author, content, post_id]
       );
 
-      return { statusCode: 200, headers, body: JSON.stringify(result.rows[0]) };
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ message: '评论已保存', post_id }),
+      };
     }
 
     return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method Not Allowed' }) };
+
   } catch (err) {
-    console.error(err);
+    console.error('数据库错误:', err.message);
     return { statusCode: 500, headers, body: JSON.stringify({ error: err.message }) };
   } finally {
     await client.end();

@@ -1,56 +1,83 @@
 ---
-const { postId } = Astro.props; // 每篇文章传入唯一的 postId (slug)
+const { postId } = Astro.props;
+
+if (!postId) {
+  throw new Error("CommentSection 需要传入 postId 属性");
+}
 ---
 
-<section id="comments">
-  <h3>评论区</h3>
-
+<section id="comments" data-post-id={postId}>
+  <h3>发表评论</h3>
   <form id="comment-form">
-    <input type="text" name="author" placeholder="你的名字" required />
-    <textarea name="content" placeholder="写下评论..." required></textarea>
+    <input type="text" id="author" placeholder="你的名字" required />
+    <textarea id="content" placeholder="写下你的评论..." required></textarea>
     <button type="submit">提交</button>
   </form>
 
+  <div id="message" style="margin:0.5rem 0;color:#d00;"></div>
+
+  <h3>最新评论</h3>
   <ul id="comment-list"></ul>
 </section>
 
 <script>
-  const postId = `{{postId}}`;
-  const apiUrl = "https://szak.netlify.app/.netlify/functions/comments";
+  const API_URL = "https://szak.netlify.app/.netlify/functions/comments";
+  const postId = document.getElementById("comments").dataset.postId;
+  const form = document.getElementById("comment-form");
+  const list = document.getElementById("comment-list");
+  const message = document.getElementById("message");
 
+  // 加载评论
   async function loadComments() {
     try {
-      const res = await fetch(`${apiUrl}?post_id=${postId}`);
+      const res = await fetch(`${API_URL}?post_id=${postId}`);
+      if (!res.ok) throw new Error(await res.text());
       const comments = await res.json();
-      const list = document.getElementById("comment-list");
-      list.innerHTML = comments
-        .map(c => `<li><b>${c.author}</b>: ${c.content}</li>`)
-        .join("");
+      list.innerHTML = comments.map(c => `
+        <li>
+          <strong>${c.author}</strong><br/>
+          ${c.content}<br/>
+          <small>${new Date(c.created_at).toLocaleString()}</small>
+        </li>
+      `).join("");
     } catch (err) {
-      console.error("加载评论失败:", err);
+      message.textContent = "加载评论失败：" + err.message;
     }
   }
 
-  document.getElementById("comment-form").addEventListener("submit", async (e) => {
+  // 提交评论
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const form = e.target;
-    const data = {
-      author: form.author.value,
-      content: form.content.value,
-      post_id: postId
-    };
+    const author = document.getElementById("author").value.trim();
+    const content = document.getElementById("content").value.trim();
+
+    if (!author || !content) {
+      message.textContent = "请填写完整信息";
+      return;
+    }
+
     try {
-      await fetch(apiUrl, {
+      const res = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
+        body: JSON.stringify({ author, content, post_id: postId })
       });
+
+      if (!res.ok) {
+        const err = await res.text();
+        message.textContent = "提交失败：" + err;
+        return;
+      }
+
       form.reset();
+      message.style.color = "green";
+      message.textContent = "评论已提交！";
       loadComments();
     } catch (err) {
-      console.error("提交评论失败:", err);
+      message.textContent = "网络错误：" + err.message;
     }
   });
 
+  // 页面加载时获取评论
   loadComments();
 </script>
