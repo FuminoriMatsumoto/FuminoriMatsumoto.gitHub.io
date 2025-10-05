@@ -1,130 +1,154 @@
 ---
-const { postId } = Astro.props;
+import { getCollection } from "astro:content";
 
-// 如果父页面没传 postId，就直接报错，避免存空值
-if (!postId) {
-  throw new Error("CommentSection 需要传入 postId 属性");
+// 生成静态路径
+export async function getStaticPaths() {
+  const posts = await getCollection("articles");
+  return posts.map((post) => ({
+    params: { article: post.slug.split("/") },
+    props: { post },
+  }));
 }
+
+const { post } = Astro.props;
+const postId = post.id || post.slug; // 用文章 id 或 slug 作为评论区的 postId
 ---
 
-<section id="comments" data-post-id={postId}>
-  <h3>发表评论</h3>
-  <form id="comment-form">
-    <input type="text" id="author" placeholder="你的名字" required />
-    <textarea id="content" placeholder="写下你的评论..." required></textarea>
-    <button type="submit">提交</button>
-  </form>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{post.data.title}</title>
+  </head>
+  <body>
+    <main>
+      <h1>{post.data.title}</h1>
+      <p><small>{post.data.date.toLocaleDateString()}</small></p>
+      <article>
+        {post.body}
+      </article>
 
-  <div id="message" style="margin:0.5rem 0;color:#d00;"></div>
+      <!-- 评论区 -->
+      <section id="comments" data-post-id={postId}>
+        <h3>发表评论</h3>
+        <form id="comment-form">
+          <input type="text" id="author" placeholder="你的名字" required />
+          <textarea id="content" placeholder="写下你的评论..." required></textarea>
+          <button type="submit">提交</button>
+        </form>
 
-  <h3>最新评论</h3>
-  <ul id="comment-list"></ul>
-</section>
+        <div id="message" style="margin:0.5rem 0;color:#d00;"></div>
 
-<script>
-  const postId = document.getElementById("comments").dataset.postId;
-  const form = document.getElementById("comment-form");
-  const list = document.getElementById("comment-list");
-  const message = document.getElementById("message");
+        <h3>最新评论</h3>
+        <ul id="comment-list"></ul>
+      </section>
+    </main>
 
-  // 加载评论
-  async function loadComments() {
-    try {
-      const res = await fetch(`/.netlify/functions/comments?post_id=${postId}`);
-      if (!res.ok) throw new Error(await res.text());
-      const comments = await res.json();
-      list.innerHTML = comments.map(c => `
-        <li>
-          <strong>${c.author}</strong><br/>
-          ${c.content}<br/>
-          <small>${new Date(c.created_at).toLocaleString()}</small>
-        </li>
-      `).join("");
-    } catch (err) {
-      message.textContent = "加载评论失败：" + err.message;
-    }
-  }
+    <script>
+      const postId = document.getElementById("comments").dataset.postId;
+      const form = document.getElementById("comment-form");
+      const list = document.getElementById("comment-list");
+      const message = document.getElementById("message");
 
-  // 提交评论
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const author = document.getElementById("author").value.trim();
-    const content = document.getElementById("content").value.trim();
-
-    if (!author || !content) {
-      message.textContent = "请填写完整信息";
-      return;
-    }
-
-    try {
-      const res = await fetch("/.netlify/functions/comments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ author, content, post_id: postId })
-      });
-
-      if (!res.ok) {
-        const err = await res.text();
-        message.textContent = "提交失败：" + err;
-        return;
+      // 加载评论
+      async function loadComments() {
+        try {
+          const res = await fetch(`/.netlify/functions/comments?post_id=${postId}`);
+          if (!res.ok) throw new Error(await res.text());
+          const comments = await res.json();
+          list.innerHTML = comments.map(c => `
+            <li>
+              <strong>${c.author}</strong><br/>
+              ${c.content}<br/>
+              <small>${new Date(c.created_at).toLocaleString()}</small>
+            </li>
+          `).join("");
+        } catch (err) {
+          message.textContent = "加载评论失败：" + err.message;
+        }
       }
 
-      form.reset();
-      message.style.color = "green";
-      message.textContent = "评论已提交！";
+      // 提交评论
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const author = document.getElementById("author").value.trim();
+        const content = document.getElementById("content").value.trim();
+
+        if (!author || !content) {
+          message.textContent = "请填写完整信息";
+          return;
+        }
+
+        try {
+          const res = await fetch("/.netlify/functions/comments", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ author, content, post_id: postId })
+          });
+
+          if (!res.ok) {
+            const err = await res.text();
+            message.textContent = "提交失败：" + err;
+            return;
+          }
+
+          form.reset();
+          message.style.color = "green";
+          message.textContent = "评论已提交！";
+          loadComments();
+        } catch (err) {
+          message.textContent = "网络错误：" + err.message;
+        }
+      });
+
+      // 页面加载时获取评论
       loadComments();
-    } catch (err) {
-      message.textContent = "网络错误：" + err.message;
-    }
-  });
+    </script>
 
-  // 页面加载时获取评论
-  loadComments();
-</script>
-
-<style>
-  #comments {
-    background: #fff;
-    padding: 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-    margin-top: 2rem;
-  }
-  #comment-form {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-  }
-  #comment-form input,
-  #comment-form textarea {
-    padding: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1rem;
-  }
-  #comment-form button {
-    align-self: flex-start;
-    background: #2563eb;
-    color: #fff;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  #comment-form button:hover {
-    background: #1d4ed8;
-  }
-  #comment-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  #comment-list li {
-    padding: 0.5rem 0;
-    border-bottom: 1px solid #eee;
-  }
-  #comment-list li:last-child {
-    border-bottom: none;
-  }
-</style>
+    <style>
+      #comments {
+        background: #fff;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        margin-top: 2rem;
+      }
+      #comment-form {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+      }
+      #comment-form input,
+      #comment-form textarea {
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1rem;
+      }
+      #comment-form button {
+        align-self: flex-start;
+        background: #2563eb;
+        color: #fff;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      #comment-form button:hover {
+        background: #1d4ed8;
+      }
+      #comment-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      #comment-list li {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #eee;
+      }
+      #comment-list li:last-child {
+        border-bottom: none;
+      }
+    </style>
+  </body>
+</html>
