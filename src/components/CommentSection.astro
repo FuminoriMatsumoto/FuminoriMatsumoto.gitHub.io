@@ -1,0 +1,56 @@
+---
+const { postId } = Astro.props; // 每篇文章传入唯一的 postId (slug)
+---
+
+<section id="comments">
+  <h3>评论区</h3>
+
+  <form id="comment-form">
+    <input type="text" name="author" placeholder="你的名字" required />
+    <textarea name="content" placeholder="写下评论..." required></textarea>
+    <button type="submit">提交</button>
+  </form>
+
+  <ul id="comment-list"></ul>
+</section>
+
+<script>
+  const postId = `{{postId}}`;
+  const apiUrl = "https://szak.netlify.app/.netlify/functions/comments";
+
+  async function loadComments() {
+    try {
+      const res = await fetch(`${apiUrl}?post_id=${postId}`);
+      const comments = await res.json();
+      const list = document.getElementById("comment-list");
+      list.innerHTML = comments
+        .map(c => `<li><b>${c.author}</b>: ${c.content}</li>`)
+        .join("");
+    } catch (err) {
+      console.error("加载评论失败:", err);
+    }
+  }
+
+  document.getElementById("comment-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const data = {
+      author: form.author.value,
+      content: form.content.value,
+      post_id: postId
+    };
+    try {
+      await fetch(apiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+      form.reset();
+      loadComments();
+    } catch (err) {
+      console.error("提交评论失败:", err);
+    }
+  });
+
+  loadComments();
+</script>
