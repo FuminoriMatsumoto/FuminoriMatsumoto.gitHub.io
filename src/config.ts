@@ -89,13 +89,13 @@ export default {
   Comment: {
     // Twikoo 评论
     Twikoo: {
-      enable: true,
-      envId: 'https://szak.netlify.app/.netlify/functions/comments'
+      enable: false,
+      envId: ''
     },
     // Waline 评论
     Waline: {
-      enable: false,
-      serverURL: ''
+      enable: true,
+      serverURL: 'https://szakblog.vercel.app/'
     }
   },
   // Han Analytics 统计（）
