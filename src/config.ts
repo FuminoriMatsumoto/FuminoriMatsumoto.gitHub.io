@@ -89,8 +89,8 @@ export default {
   Comment: {
     // Twikoo 评论
     Twikoo: {
-      enable: false,
-      envId: ''
+      enable: true,
+      envId: 'https://szak.netlify.app/.netlify/functions/comments'
     },
     // Waline 评论
     Waline: {
